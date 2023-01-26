@@ -16,6 +16,10 @@ def test_login():
 def test_jobsearch():
     client = LinkedInClient()
     r, part1, client_page_instance = client.login()
+    # TODO Captcha check
+    if "Security Verification" in r.content.decode():
+        print("Captcha check")
+        return True
     paging, elements = client.get_jobs("automation", 0)
     print("end")
 

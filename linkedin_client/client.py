@@ -5,13 +5,7 @@ from requests import Session
 import urllib.parse
 
 from .api_objects import Elements, Paging
-
-
-username = os.environ.get("username", None)
-password = os.environ.get("password", None)
-print(username, password)
-if username is None or password is None:
-    from .credentials import username, password
+from .credentials import username, password
 
 
 
@@ -83,7 +77,7 @@ class LinkedInClient(Session):
         parameters = urllib.parse.urlencode(parameters, safe='(),', quote_via=urllib.parse.quote)
         r = self.get(hits_url, params=parameters)
         if r.status_code != 200:
-            assert False
+            raise AssertionError(r.content)
         r = r.json()
         print(r.keys())
         paging = Paging(r['paging'])
