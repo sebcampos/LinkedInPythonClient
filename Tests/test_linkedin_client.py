@@ -1,4 +1,9 @@
+import pytest
 from linkedin_client import LinkedInClient
+from Logger import set_up_logger
+
+
+logger = set_up_logger("testing-logger")
 
 
 test_url = \
@@ -19,7 +24,7 @@ def test_jobsearch():
     # TODO Captcha check
     if "Security Verification" in r.content.decode():
         print("Captcha check")
-        return True
+        pytest.skip("Captcha detected")
     paging, elements = client.get_jobs("automation", 0)
-    print("end")
+    assert True
 
