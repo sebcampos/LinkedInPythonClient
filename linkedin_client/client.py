@@ -1,10 +1,20 @@
+import os
 import re
 import json
 from requests import Session
 import urllib.parse
 
 from .api_objects import Elements, Paging
-from .credentials import username, password
+
+
+username = os.environ.get("username", None)
+password = os.environ.get("password", None)
+print(username, password)
+if username is None or password is None:
+    from .credentials import username, password
+
+
+
 
 url = "https://www.linkedin.com"
 login_url = "https://www.linkedin.com/uas/login-submit"
