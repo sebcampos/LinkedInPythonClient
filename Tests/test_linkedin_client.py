@@ -12,7 +12,7 @@ test_url = \
 def test_login():
     client = LinkedInClient()
     r = client.login()
-    assert r.status_code == 200
+    assert r[0].status_code == 200
     print(r.content)
 
 
