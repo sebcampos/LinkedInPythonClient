@@ -21,12 +21,12 @@ def test_jobsearch():
     client = LinkedInClient()
     r, part1, client_page_instance = client.login()
     random_start = random.randint(0, 300)
-    print(f"Random num: {random_start}")
+    logger.info(f"Random num: {random_start}")
     paging, elements = client.get_jobs("devops engineer", random_start)
-    print(f"Suggestion: {elements[0].hitInfo.querySuggestionsComponent}\n\n")
+    logger.info(f"Suggestion: {elements[0].hitInfo.querySuggestionsComponent}\n\n")
     for element in elements[1:]:
         job = element.hitInfo.jobPostingResolutionResult
         company = job.companyDetails.get('com.linkedin.voyager.deco.jserp.WebJobPostingWithCompanyName', None)
         company = company['companyResolutionResult']['name'] if company is not None else company
-        print(f"Title: {job.title}\nJob State: {job.jobState}\nWork From Home: {job.workRemoteAllowed}\nSalary: {job.formattedSalaryDescription}\nCompany: {company}\nLocation: {job.formattedLocation}\n\n")
+        logger.info(f"Title: {job.title}\nJob State: {job.jobState}\nWork From Home: {job.workRemoteAllowed}\nSalary: {job.formattedSalaryDescription}\nCompany: {company}\nLocation: {job.formattedLocation}\n\n")
     assert True
