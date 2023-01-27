@@ -1,14 +1,13 @@
-import os
 import re
 import json
 from requests import Session
 import urllib.parse
+from Logger import set_up_logger
 
-from .api_objects import Elements, Paging
-from .credentials import username, password
+from .api_objects import Element, Paging
+from .credentials import username, password, cookie_path
 
-
-
+logger = set_up_logger("LinkedInClient")
 
 url = "https://www.linkedin.com"
 login_url = "https://www.linkedin.com/uas/login-submit"
@@ -47,6 +46,17 @@ class LinkedInClient(Session):
                     "session_password": password,
                 }
         )
+        if "Security Verification" in r.content.decode() or r.status_code != 200:
+            logger.warning("Captcha check")
+            self.csrf_token = self.cookies.get("JSESSIONID").replace('"', '')
+            self.headers.update({"csrf-token": self.csrf_token})
+            self.cookies.clear_session_cookies()
+            with open(cookie_path, "r") as f:
+                session = json.loads(f.read())
+            for cookie in session:
+                self.cookies.update(cookie)
+            self.get(url)
+
         data_str = r.content.decode().replace("&quot;", '"')
         code_data = tuple(i[0].replace("&#92;", "\\") for i in re.findall(r'<code.*>((.|\n|\t)+?)</code>', data_str))
         part1 = tuple(json.loads(i) for i in code_data[:-1])
@@ -55,8 +65,9 @@ class LinkedInClient(Session):
         self.headers.update({"csrf-token": self.csrf_token})
         return r, part1, client_page_instance
 
-    def get_jobs(self, keywords, start, filters=None, origin=None, q=None, query_context=None, top_n_requested=None, decoration_id=None, count=50) -> tuple:
-        decoration_id = "com.linkedin.voyager.deco.jserp.WebJobSearchHitWithSalary-50" if decoration_id is None else decoration_id
+    def get_jobs(self, keywords, start, filters=None, origin=None, q=None, query_context=None, top_n_requested=None,
+                 decoration_id=None, count=50) -> tuple:
+        decoration_id = "com.linkedin.voyager.deco.jserp.WebJobSearchHitWithSalary-25" if decoration_id is None else decoration_id
         origin = "JOB_SEARCH_PAGE_KEYWORD_AUTOCOMPLETE" if origin is None else origin
         filters = "List(locationFallback->United States,geoUrn->urn:li:fs_geo:103644278,resultType->JOBS)" if filters is None else filters
         q = "jserpFilters" if q is None else q
@@ -77,9 +88,8 @@ class LinkedInClient(Session):
         parameters = urllib.parse.urlencode(parameters, safe='(),', quote_via=urllib.parse.quote)
         r = self.get(hits_url, params=parameters)
         if r.status_code != 200:
-            raise AssertionError(r.content)
+            raise AssertionError(r.content.decode())
         r = r.json()
-        print(r.keys())
         paging = Paging(r['paging'])
-        elements = Elements(r['elements'])
+        elements = tuple(Element(element) for element in r['elements'])
         return paging, elements

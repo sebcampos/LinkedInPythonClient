@@ -1,5 +1,9 @@
 class BaseClass:
     string_rep: str
+    string_rep2: str
+
+    def __str__(self):
+        return self.string_rep2
 
     def __repr__(self):
         return self.string_rep
@@ -19,16 +23,15 @@ class Element(BaseClass):
             print(hitInfo)
         self.hitInfo = hitInfo
         self.trackingId = element_dict['trackingId']
-        self.string_rep = str(element_dict)
+        self.string_rep = "Element"
+        self.string_rep2 = str({i: type(v) for i, v in element_dict.items()})
 
 
-class Elements(BaseClass):
-    items = ()
-
+class Elements(tuple):
     def __init__(self, elements: list):
-        self.string_rep = str(elements)
-        for element in elements:
-            self.items += (Element(element),)
+        elements = (Element(element) for element in elements)
+        super().__init__(self, elements)
+
 
 
 class Paging(BaseClass):
@@ -36,7 +39,6 @@ class Paging(BaseClass):
     count: int
     start: int
     links: list
-
 
     def __init__(self, paging_dict: dict):
         self.total = paging_dict['total']
@@ -87,14 +89,13 @@ class JobPostingResolutionResult(BaseClass):
         self.jobPostingId = job_posting_dict['jobPostingId']
         self.DSrecipeType = job_posting_dict['$recipeType']
         self.sourceDomain = job_posting_dict.get('sourceDomain', None)
-        self.string_rep = str(job_posting_dict)
+        self.string_rep = ", ".join(i for i in job_posting_dict.keys())
+        self.string_rep2 = "\n".join(str(i)+" "+str(self.__getattribute__(str(i))) for i in self.__dir__() if not i.startswith("__"))
 
-
-
-class QuerySuggestionsComponent:
+class QuerySuggestionsComponent(BaseClass):
     def __init__(self, query_suggestion: dict):
         suggestions = tuple(i['keywords'] for i in query_suggestion)
-        self.string_rep = ",".join(suggestions)
+        self.string_rep2 = ",".join(suggestions)
 
 
 class HitInfo(BaseClass):
@@ -104,20 +105,22 @@ class HitInfo(BaseClass):
     sponsored: object
     jobPosting: object  # urn
     DSrecipeType: object
-    suggestions: dict
     jobPostingResolutionResult: JobPostingResolutionResult
+    querySuggestionsComponent: QuerySuggestionsComponent = None
 
     def __init__(self, hit_info_dict: dict):
         self.key = next(i for i in hit_info_dict.keys())
-        suggestions = hit_info_dict[self.key].get("suggestions", None)
-        if suggestions is not None:
-            self.suggestions = QuerySuggestionsComponent(suggestions)
+        querySuggestionsComponent = hit_info_dict[self.key].get("suggestions", None)
+        if querySuggestionsComponent is not None:
+            self.querySuggestionsComponent = QuerySuggestionsComponent(querySuggestionsComponent)
         self.encryptedBiddingParameters = hit_info_dict[self.key].get('encryptedBiddingParameters', None)
-        self.topNRelevanceReasonsInjectionResult = hit_info_dict[self.key].get('topNRelevanceReasonsInjectionResult',None)
+        self.topNRelevanceReasonsInjectionResult = hit_info_dict[self.key].get('topNRelevanceReasonsInjectionResult',
+                                                                               None)
         self.sponsored = hit_info_dict[self.key].get('sponsored', None)
         self.jobPosting = hit_info_dict[self.key].get('jobPosting', None)
         self.DSrecipeType = hit_info_dict[self.key].get('$recipeType', None)
         job_posting_resolution_result = hit_info_dict[self.key].get('jobPostingResolutionResult', None)
-        self.jobPostingResolutionResult = JobPostingResolutionResult(job_posting_resolution_result) if job_posting_resolution_result is not None else None
+        self.jobPostingResolutionResult = JobPostingResolutionResult(
+            job_posting_resolution_result) if job_posting_resolution_result is not None else None
         self.string_rep = str(hit_info_dict)
-
+        self.string_rep2 = "HitInfo"
