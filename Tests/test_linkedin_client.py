@@ -11,15 +11,15 @@ test_url = \
 
 def test_login():
     client = LinkedInClient()
-    r = client.login()
-    assert r[0].status_code == 200
+    r, part1, client_page_instance = client.login()
+    assert r.status_code == 200
     print(r.content)
 
 
 
 def test_jobsearch():
     client = LinkedInClient()
-    r = client.login()
+    r, part1, client_page_instance = client.login()
     random_start = random.randint(0, 300)
     print(f"Random num: {random_start}")
     paging, elements = client.get_jobs("devops engineer", random_start)
