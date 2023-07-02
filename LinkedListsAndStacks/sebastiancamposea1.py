@@ -41,6 +41,7 @@ class TestDriver:
 
     @staticmethod
     def test_case_1():
+        """Provided test case 1"""
         i = TestDriver.test_inputs[0]
         stack = Stack.create_stack()
         for char in i:
@@ -48,6 +49,7 @@ class TestDriver:
 
     @staticmethod
     def test_case_2():
+        """Provided test case 2"""
         i = TestDriver.test_inputs[1]
         stack = Stack.create_stack()
         for char in i:
@@ -55,6 +57,7 @@ class TestDriver:
 
     @staticmethod
     def test_case_3():
+        """Provided test case 3"""
         i = TestDriver.test_inputs[2]
         stack = Stack.create_stack()
         for char in i:
@@ -84,7 +87,6 @@ class TestDriver:
         for char in i:
             TestDriver.validate_char_and_add_to_stack(stack, char)
 
-
     @staticmethod
     def test_case_6():
         """test non symbol characters"""
@@ -95,10 +97,9 @@ class TestDriver:
             TestDriver.validate_char_and_add_to_stack(stack, char)
 
 
-
 if __name__ == "__main__":
     """
-    commented out run
+    commented out run ...
     [PASSED test 1] Assertion error raised for input 1 "([|)]"
 
 	Parsing error:
@@ -107,7 +108,7 @@ if __name__ == "__main__":
 
     [PASSED test 2] No exception raised for input 2 "() (() [()])"
     
-    [PASSED test 3] No exception raise for input 3 "{{([][])}()}"
+    [PASSED test 3] No exception raised for input 3 "{{([][])}()}"
     
     [PASSED test 4] Value error raised when attempting to pop from empty stack
     
@@ -147,7 +148,8 @@ if __name__ == "__main__":
 
     try:
         TestDriver.test_case_5()
-        print(f'\n[PASSED test 5] was able to parse "{TestDriver.test_inputs[3]}" and "{TestDriver.test_inputs[4]}" with no error')
+        print(
+            f'\n[PASSED test 5] No exception raise for inputs 4 and 5 "{TestDriver.test_inputs[3]}" and "{TestDriver.test_inputs[4]}" with no error')
     except AssertionError as e:
         print('\n[FAILED TEST 5]')
         print(e)
@@ -156,5 +158,6 @@ if __name__ == "__main__":
         TestDriver.test_case_6()
         print('\n[FAILED TEST 6]')
     except AssertionError as e:
-        print(f'\n[PASSED test 6] Assertion error raised for input 6 "{TestDriver.test_inputs[5]}" unmatched opening "("')
+        print(
+            f'\n[PASSED test 6] Assertion error raised for input 6 "{TestDriver.test_inputs[5]}" unmatched opening "("')
         print(e)
