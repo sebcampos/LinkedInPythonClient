@@ -59,7 +59,7 @@ class Node:
         :param new_node: Node instance
         :return: void
         """
-        if type(new_node) != Node:
+        if new_node is not None and type(new_node) != Node:
             raise ValueError('Can not add non Node class as next node')
         self._next_node = new_node
 
